@@ -21,9 +21,16 @@ public class RobotApplicationTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
+    @Test
+    public void getReport_returnsRobotNotFoundException() {
+
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot/report", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+/*
 	@Test
 	public void getReport_returnsRobotDetails() {
-
 		ResponseEntity<Robot> response = restTemplate.getForEntity("/robot/report", Robot.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -31,5 +38,44 @@ public class RobotApplicationTests {
 		assertThat(response.getBody().getY()).isEqualTo(0);
 		assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
 	}
+	*/
 
+    @Test
+    public void placeRobot_returnsOk() {
+        Robot robotRequest = new Robot();
+        robotRequest.setX(2);
+        robotRequest.setY(2);
+        robotRequest.setF(Direction.SOUTH);
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot/place", robotRequest, String.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot/report", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(2);
+        assertThat(response.getBody().getY()).isEqualTo(2);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.SOUTH);
+    }
+
+    @Test
+    public void placeRobot_returnsInvalidCoordinates() {
+        Robot robotRequest = new Robot();
+
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot/place", robotRequest, String.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+/*
+    @Test
+    public void placeRobot_returnsInvalidDirection() {
+        Robot robotRequest = new Robot();
+
+        String requestBody = "{\"x\":1, \"y\":1, \"f\":\"wrong\"}";
+
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot/place", requestBody, String.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+*/
 }

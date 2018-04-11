@@ -26,4 +26,12 @@ public class RobotRepository {
     public Robot find() {
         return robot;
     }
+
+    public void update(Robot robot) {
+        synchronized (robot) {
+            this.robot.setX(robot.getX());
+            this.robot.setY(robot.getY());
+            this.robot.setF(robot.getF());
+        }
+    }
 }

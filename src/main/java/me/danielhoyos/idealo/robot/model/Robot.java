@@ -1,9 +1,23 @@
 package me.danielhoyos.idealo.robot.model;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+
+import static me.danielhoyos.idealo.robot.utils.Constant.X_UNITS;
+import static me.danielhoyos.idealo.robot.utils.Constant.Y_UNITS;
+
 public class Robot {
 
-    private int x = 0;
-    private int y = 0;
+    @PositiveOrZero
+    @Max(X_UNITS - 1)
+    private int x = -1;
+
+    @PositiveOrZero
+    @Max(Y_UNITS - 1)
+    private int y = -1;
+
+    @NotNull
     private Direction f = Direction.NORTH;
 
     public enum Direction {
