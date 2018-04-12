@@ -21,7 +21,7 @@ public class Robot {
     private Direction f = Direction.NORTH;
 
     public enum Direction {
-        NORTH, SOUTH, EAST, WEST;
+        NORTH, EAST, SOUTH, WEST
     }
 
     public int getX() {

@@ -12,7 +12,9 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import static me.danielhoyos.idealo.robot.model.Robot.Direction;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
@@ -59,7 +61,7 @@ public class RobotServiceTest {
     }
 
     @Test
-    public void placeRobot_returnsRobot() {
+    public void placeRobot_updatesRobot() {
         Robot robot = new Robot();
         robot.setY(2);
         robot.setX(2);
@@ -67,5 +69,49 @@ public class RobotServiceTest {
         robotService.placeRobot(robot);
 
         verify(robotRepository).update(robot);
+    }
+
+    @Test
+    public void turnRight_updatesRobot() {
+        Robot robot = new Robot();
+        robot.setY(2);
+        robot.setX(2);
+
+        given(robotRepository.find()).willReturn(robot);
+
+        robotService.turnRight();
+
+        verify(robotRepository).update(robot);
+    }
+
+    @Test(expected = RobotNotFoundException.class)
+    public void turnRight_returnsRobotNotFoundException() {
+        given(robotRepository.find()).willReturn(new Robot());
+
+        robotService.turnRight();
+
+        verify(robotRepository, times(0)).update(any(Robot.class));
+    }
+
+    @Test
+    public void turnLeft_updatesRobot() {
+        Robot robot = new Robot();
+        robot.setY(2);
+        robot.setX(2);
+
+        given(robotRepository.find()).willReturn(robot);
+
+        robotService.turnLeft();
+
+        verify(robotRepository).update(robot);
+    }
+
+    @Test(expected = RobotNotFoundException.class)
+    public void turnLeft_returnsRobotNotFoundException() {
+        given(robotRepository.find()).willReturn(new Robot());
+
+        robotService.turnLeft();
+
+        verify(robotRepository, times(0)).update(any(Robot.class));
     }
 }

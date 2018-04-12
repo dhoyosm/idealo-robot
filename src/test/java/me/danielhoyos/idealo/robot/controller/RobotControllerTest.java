@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static me.danielhoyos.idealo.robot.model.Robot.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +43,7 @@ public class RobotControllerTest {
 
         given(robotService.getReport()).willReturn(robot);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/robot/report"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/robot"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("x").value(0))
                 .andExpect(jsonPath("y").value(0))
@@ -54,7 +56,7 @@ public class RobotControllerTest {
 
         given(robotService.getReport()).willThrow(new RobotNotFoundException());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/robot/report"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/robot"))
                 .andExpect(status().isNotFound());
 
     }
@@ -67,11 +69,47 @@ public class RobotControllerTest {
 
         String json = mapper.writeValueAsString(robot);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/robot/place")
+        mockMvc.perform(MockMvcRequestBuilders.post("/robot")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content(json))
                 .andExpect(status().isOk());
 
         verify(robotService).placeRobot(any(Robot.class));
+    }
+
+    @Test
+    public void turnRight_ShouldReturnsOk() throws Exception {
+         mockMvc.perform(MockMvcRequestBuilders.put("/robot/right"))
+                .andExpect(status().isOk());
+
+         verify(robotService).turnRight();
+    }
+
+    @Test
+    public void turnRight_ShouldReturnRobotNotFound() throws Exception {
+        doThrow(RobotNotFoundException.class).when(robotService).turnRight();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/robot/right"))
+                .andExpect(status().isNotFound());
+
+        verify(robotService).turnRight();
+    }
+
+    @Test
+    public void turnLeft_ShouldReturnsOk() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/robot/left"))
+                .andExpect(status().isOk());
+
+        verify(robotService).turnLeft();
+    }
+
+    @Test
+    public void turnLeft_ShouldReturnRobotNotFound() throws Exception {
+        doThrow(RobotNotFoundException.class).when(robotService).turnLeft();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/robot/left"))
+                .andExpect(status().isNotFound());
+
+        verify(robotService).turnLeft();
     }
 }

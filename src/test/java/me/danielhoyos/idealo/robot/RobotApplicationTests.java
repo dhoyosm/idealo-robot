@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -24,21 +25,10 @@ public class RobotApplicationTests {
     @Test
     public void getReport_returnsRobotNotFoundException() {
 
-        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot/report", Robot.class);
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot", Robot.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
-/*
-	@Test
-	public void getReport_returnsRobotDetails() {
-		ResponseEntity<Robot> response = restTemplate.getForEntity("/robot/report", Robot.class);
-
-		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(response.getBody().getX()).isEqualTo(0);
-		assertThat(response.getBody().getY()).isEqualTo(0);
-		assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
-	}
-	*/
 
     @Test
     public void placeRobot_returnsOk() {
@@ -46,11 +36,11 @@ public class RobotApplicationTests {
         robotRequest.setX(2);
         robotRequest.setY(2);
         robotRequest.setF(Direction.SOUTH);
-        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot/place", robotRequest, String.class);
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot", robotRequest, String.class);
 
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot/report", Robot.class);
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot", Robot.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getX()).isEqualTo(2);
@@ -62,10 +52,97 @@ public class RobotApplicationTests {
     public void placeRobot_returnsInvalidCoordinates() {
         Robot robotRequest = new Robot();
 
-        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot/place", robotRequest, String.class);
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot", robotRequest, String.class);
 
         assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
+
+    @Test
+    public void turnRight_returnsOk() {
+        Robot robotRequest = new Robot();
+        robotRequest.setX(2);
+        robotRequest.setY(2);
+
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot", robotRequest, String.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<String> putResponse = restTemplate.exchange
+                ("/robot/right", HttpMethod.PUT, null, String.class);
+
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(2);
+        assertThat(response.getBody().getY()).isEqualTo(2);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.EAST);
+
+        restTemplate.exchange("/robot/right", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getBody().getF()).isEqualTo(Direction.SOUTH);
+
+        restTemplate.exchange("/robot/right", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getBody().getF()).isEqualTo(Direction.WEST);
+
+        restTemplate.exchange("/robot/right", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
+    }
+
+    @Test
+    public void turnLeft_returnsOk() {
+        Robot robotRequest = new Robot();
+        robotRequest.setX(2);
+        robotRequest.setY(2);
+
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot", robotRequest, String.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<String> putResponse = restTemplate.exchange
+                ("/robot/left", HttpMethod.PUT, null, String.class);
+
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(2);
+        assertThat(response.getBody().getY()).isEqualTo(2);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.WEST);
+
+        restTemplate.exchange("/robot/left", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getBody().getF()).isEqualTo(Direction.SOUTH);
+
+        restTemplate.exchange("/robot/left", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getBody().getF()).isEqualTo(Direction.EAST);
+
+        restTemplate.exchange("/robot/left", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
+    }
+
+    /*
+    @Test
+    public void turnRight_returnsRobotNotFoundException() {
+        ResponseEntity<String> putResponse = restTemplate.exchange
+                ("/robot/right", HttpMethod.PUT, null, String.class);
+
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+    */
+
 /*
     @Test
     public void placeRobot_returnsInvalidDirection() {
