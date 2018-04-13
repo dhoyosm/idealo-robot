@@ -1,6 +1,7 @@
 package me.danielhoyos.idealo.robot.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.danielhoyos.idealo.robot.exceptions.ForbiddenMoveException;
 import me.danielhoyos.idealo.robot.exceptions.RobotNotFoundException;
 import me.danielhoyos.idealo.robot.model.Robot;
 import me.danielhoyos.idealo.robot.service.RobotService;
@@ -41,24 +42,22 @@ public class RobotControllerTest {
         robot.setX(0);
         robot.setY(0);
 
-        given(robotService.getReport()).willReturn(robot);
+        given(robotService.getReportRobot()).willReturn(robot);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/robot"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("x").value(0))
                 .andExpect(jsonPath("y").value(0))
                 .andExpect(jsonPath("f").value("NORTH"));
-
     }
 
     @Test
     public void getReport_ShouldReturnRobotNotFound() throws Exception {
 
-        given(robotService.getReport()).willThrow(new RobotNotFoundException());
+        given(robotService.getReportRobot()).willThrow(new RobotNotFoundException());
 
         mockMvc.perform(MockMvcRequestBuilders.get("/robot"))
                 .andExpect(status().isNotFound());
-
     }
 
     @Test
@@ -111,5 +110,33 @@ public class RobotControllerTest {
                 .andExpect(status().isNotFound());
 
         verify(robotService).turnLeft();
+    }
+
+    @Test
+    public void move_ShouldReturnsOk() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.put("/robot/move"))
+                .andExpect(status().isOk());
+
+        verify(robotService).move();
+    }
+
+    @Test
+    public void move_ShouldReturnRobotNotFound() throws Exception {
+        doThrow(RobotNotFoundException.class).when(robotService).move();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/robot/move"))
+                .andExpect(status().isNotFound());
+
+        verify(robotService).move();
+    }
+
+    @Test
+    public void move_ShouldReturnForbiddenMove() throws Exception {
+        doThrow(ForbiddenMoveException.class).when(robotService).move();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/robot/move"))
+                .andExpect(status().isForbidden());
+
+        verify(robotService).move();
     }
 }

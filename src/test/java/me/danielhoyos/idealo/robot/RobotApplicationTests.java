@@ -133,26 +133,69 @@ public class RobotApplicationTests {
         assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
     }
 
-    /*
     @Test
-    public void turnRight_returnsRobotNotFoundException() {
-        ResponseEntity<String> putResponse = restTemplate.exchange
-                ("/robot/right", HttpMethod.PUT, null, String.class);
-
-        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-    }
-    */
-
-/*
-    @Test
-    public void placeRobot_returnsInvalidDirection() {
+    public void move_returnsOk() {
         Robot robotRequest = new Robot();
+        robotRequest.setX(0);
+        robotRequest.setY(0);
 
-        String requestBody = "{\"x\":1, \"y\":1, \"f\":\"wrong\"}";
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot", robotRequest, String.class);
 
-        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot/place", requestBody, String.class);
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
 
-        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        ResponseEntity<String> putResponse = restTemplate.exchange
+                ("/robot/move", HttpMethod.PUT, null, String.class);
+
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(0);
+        assertThat(response.getBody().getY()).isEqualTo(1);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
+
+        restTemplate.exchange("/robot/move", HttpMethod.PUT, null, String.class);
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(0);
+        assertThat(response.getBody().getY()).isEqualTo(2);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
     }
-*/
+
+    @Test
+    public void move_returnsForbidden() {
+        Robot robotRequest = new Robot();
+        robotRequest.setX(0);
+        robotRequest.setY(3);
+
+        ResponseEntity<String> postResponse = restTemplate.postForEntity("/robot", robotRequest, String.class);
+
+        assertThat(postResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<String> putResponse = restTemplate.exchange
+                ("/robot/move", HttpMethod.PUT, null, String.class);
+
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        ResponseEntity<Robot> response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(0);
+        assertThat(response.getBody().getY()).isEqualTo(4);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
+
+        putResponse = restTemplate.exchange
+                ("/robot/move", HttpMethod.PUT, null, String.class);
+        assertThat(putResponse.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        response = restTemplate.getForEntity("/robot", Robot.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().getX()).isEqualTo(0);
+        assertThat(response.getBody().getY()).isEqualTo(4);
+        assertThat(response.getBody().getF()).isEqualTo(Direction.NORTH);
+    }
+
 }

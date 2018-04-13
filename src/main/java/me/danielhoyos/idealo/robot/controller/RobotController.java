@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+/**
+ * Rest Controller to access robot operations
+ *
+ * @author Daniel Hoyos
+ */
 @RestController
 @RequestMapping("/robot")
 public class RobotController {
@@ -23,7 +28,7 @@ public class RobotController {
 
     @GetMapping
     private final ResponseEntity<Robot> getReport() {
-        return new ResponseEntity<>(robotService.getReport(), HttpStatus.OK);
+        return new ResponseEntity<>(robotService.getReportRobot(), HttpStatus.OK);
     }
 
     @PostMapping
@@ -41,6 +46,12 @@ public class RobotController {
     @PutMapping("/left")
     private final ResponseEntity<String> turnLeft() {
         robotService.turnLeft();
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    @PutMapping("/move")
+    private final ResponseEntity<String> move() {
+        robotService.move();
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 

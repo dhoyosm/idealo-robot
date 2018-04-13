@@ -7,6 +7,11 @@ import javax.validation.constraints.PositiveOrZero;
 import static me.danielhoyos.idealo.robot.utils.Constant.X_UNITS;
 import static me.danielhoyos.idealo.robot.utils.Constant.Y_UNITS;
 
+/**
+ * Robot object
+ *
+ * @author Daniel Hoyos
+ */
 public class Robot {
 
     @PositiveOrZero
