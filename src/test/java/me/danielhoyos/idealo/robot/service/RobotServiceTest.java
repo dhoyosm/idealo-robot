@@ -10,7 +10,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static me.danielhoyos.idealo.robot.model.Robot.Direction;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -7,7 +7,7 @@ import me.danielhoyos.idealo.robot.persistance.RobotRepository;
 import me.danielhoyos.idealo.robot.utils.Constant;
 import org.springframework.stereotype.Service;
 
-import static me.danielhoyos.idealo.robot.model.Robot.*;
+import static me.danielhoyos.idealo.robot.model.Robot.Direction;
 
 /**
  * Implementation of interface to handle robot operations
